@@ -37,7 +37,14 @@ export default function MedicalTeamPage() {
       {/* PAGE CONTENT */}
       <Section>
         <Container>
-          {/* Existing medical team content goes here */}
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              Our Healthcare Professionals
+            </h2>
+            <p className="text-gray-700 leading-relaxed">
+              Our team of registered healthcare professionals is committed to providing safe, compliant, and patient-focused medicinal cannabis consultations.
+            </p>
+          </div>
         </Container>
       </Section>
     </>

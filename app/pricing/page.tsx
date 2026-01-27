@@ -40,7 +40,14 @@ export default function PricingPage() {
       {/* PAGE CONTENT */}
       <Section>
         <Container>
-          {/* Your pricing tables / cards go here */}
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              Consultation Pricing
+            </h2>
+            <p className="text-gray-700 leading-relaxed">
+              Our consultation fees are transparent and aligned with New Zealand healthcare standards. Contact us for detailed pricing information.
+            </p>
+          </div>
         </Container>
       </Section>
     </>
