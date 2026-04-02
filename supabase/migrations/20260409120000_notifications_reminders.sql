@@ -107,7 +107,7 @@ VALUES
   'Booking confirmation',
   'Your Best Day consultation is booked — {{appointment_date}}',
   $bd$
-<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Kia ora{{patient_first_name_clause}},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Kia ora {{patient_first_name}},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Thank you for choosing <strong>Best Day</strong>. Your consultation is confirmed.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;width:100%;">
   <tr><td style="padding:16px 20px;">
@@ -121,7 +121,7 @@ VALUES
 <p style="margin:24px 0 0;font-size:13px;line-height:1.5;color:#94a3b8;">If you need to reschedule, use the link from your Calendly confirmation or contact our team.</p>
 $bd$,
   $bd$
-Kia ora{{patient_first_name_clause}},
+Kia ora {{patient_first_name}},
 
 Your Best Day consultation is booked.
 
@@ -138,7 +138,7 @@ $bd$
   '24-hour reminder',
   'Reminder: Best Day consultation tomorrow',
   $bd$
-<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi{{patient_first_name_clause}},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi {{patient_first_name}},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">This is a friendly reminder that you have a <strong>Best Day</strong> consultation coming up <strong>in about 24 hours</strong>.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;width:100%;">
   <tr><td style="padding:16px 20px;">
@@ -150,7 +150,7 @@ $bd$
 <p style="margin:0;"><a href="{{portal_url}}" style="display:inline-block;padding:12px 22px;background:#4EDD00;color:#0d2e0d;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">Patient portal</a></p>
 $bd$,
   $bd$
-Hi{{patient_first_name_clause}},
+Hi {{patient_first_name}},
 
 Reminder: your Best Day consultation is in about 24 hours.
 
@@ -167,7 +167,7 @@ $bd$
   '2-hour reminder',
   'Starting soon: your Best Day consultation',
   $bd$
-<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi{{patient_first_name_clause}},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi {{patient_first_name}},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Your <strong>Best Day</strong> consultation is coming up <strong>in about 2 hours</strong>.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;width:100%;">
   <tr><td style="padding:16px 20px;">
@@ -179,7 +179,7 @@ $bd$
 <p style="margin:0;"><a href="{{portal_url}}" style="display:inline-block;padding:12px 22px;background:#4EDD00;color:#0d2e0d;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">Open portal</a></p>
 $bd$,
   $bd$
-Hi{{patient_first_name_clause}},
+Hi {{patient_first_name}},
 
 Your Best Day consultation is in about 2 hours.
 
@@ -194,14 +194,14 @@ $bd$
   'No-show follow-up',
   'We missed you at your Best Day consultation',
   $bd$
-<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi{{patient_first_name_clause}},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi {{patient_first_name}},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">We noticed you weren’t able to join your scheduled <strong>Best Day</strong> consultation. If something came up, that’s completely understandable — life happens.</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.55;color:#374151;">If you’d still like care from our team, you’re welcome to book another time that works better for you.</p>
 <p style="margin:0;"><a href="{{booking_url}}" style="display:inline-block;padding:12px 22px;background:#4EDD00;color:#0d2e0d;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">Book again</a></p>
 <p style="margin:24px 0 0;font-size:13px;line-height:1.5;color:#94a3b8;">Questions? Reply to this email or contact us through your portal.</p>
 $bd$,
   $bd$
-Hi{{patient_first_name_clause}},
+Hi {{patient_first_name}},
 
 We missed you at your scheduled Best Day consultation. If you'd still like care, you can book again:
 
@@ -214,14 +214,14 @@ $bd$
   'Rebooking prompt after visit',
   'Thanks for visiting Best Day — book your next step',
   $bd$
-<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi{{patient_first_name_clause}},</p>
+<p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Hi {{patient_first_name}},</p>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#1f2937;">Thank you for your recent <strong>Best Day</strong> consultation. We hope it was helpful.</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.55;color:#374151;">Whenever you’re ready for follow-up or your next appointment, you can book online in a few clicks.</p>
 <p style="margin:0;"><a href="{{booking_url}}" style="display:inline-block;padding:12px 22px;background:#4EDD00;color:#0d2e0d;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">Schedule next visit</a></p>
 <p style="margin:24px 0 0;font-size:13px;line-height:1.5;color:#94a3b8;">Take care,<br/>The Best Day team</p>
 $bd$,
   $bd$
-Hi{{patient_first_name_clause}},
+Hi {{patient_first_name}},
 
 Thanks for your recent Best Day consultation. Book your next visit when you're ready:
 
