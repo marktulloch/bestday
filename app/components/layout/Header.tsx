@@ -23,7 +23,7 @@ export default function Header() {
     { id: "about", label: "About", href: "/about" },
     { id: "pricing", label: "Pricing", href: "/pricing" },
     { id: "medical-team", label: "Medical Team", href: "/medical-team" },
-    { id: "faq", label: "FAQ", href: "/faq" },
+    { id: "faq", label: "FAQ", href: "/#faq" },
   ];
 
   return (
@@ -41,11 +41,14 @@ export default function Header() {
       >
         <div className="flex items-center justify-between h-16 md:h-20 px-6 lg:px-8">
           {/* Logo */}
-          <Link
-            href="/"
-            className="text-xl font-extrabold text-[#0F3D2E] tracking-tight"
-          >
-            BESTDAY
+          <Link href="/" className="flex items-center shrink-0" aria-label="Best Day – Home">
+            <img
+              src="/logo.png"
+              alt="Best Day"
+              className="h-9 w-auto md:h-10"
+              width={140}
+              height={44}
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -64,14 +67,14 @@ export default function Header() {
           {/* Desktop Buttons */}
           <div className="hidden lg:flex items-center gap-4">
             <Link
-              href="#"
-              className="px-4 py-2 text-sm font-medium text-[#0F3D2E] border border-[#0F3D2E] rounded-lg hover:bg-[#E6F2ED] transition-colors"
+              href="/login?next=/portal"
+              className="px-4 py-2 text-sm font-medium text-[#4EDD00] border border-[#4EDD00] rounded-lg hover:bg-[#E8FBE0] transition-colors"
             >
               Patient Login
             </Link>
             <Link
               href="/prescreen"
-              className="px-4 py-2 text-sm font-medium text-white bg-[#0F3D2E] rounded-lg hover:bg-[#0C3326] transition-colors"
+              className="px-4 py-2 text-sm font-medium text-[#0d2e0d] bg-[#4EDD00] rounded-lg hover:bg-[#3db800] hover:text-[#0d2e0d] transition-colors"
             >
               Start pre-screening
             </Link>
@@ -81,7 +84,7 @@ export default function Header() {
           <div className="flex lg:hidden items-center gap-2">
             <Link
               href="/prescreen"
-              className="px-3 py-2 text-xs font-medium text-white bg-[#0F3D2E] rounded-lg"
+              className="px-3 py-2 text-xs font-medium text-[#0d2e0d] bg-[#4EDD00] rounded-lg"
             >
               Start
             </Link>
@@ -131,8 +134,8 @@ export default function Header() {
                 </Link>
               ))}
               <Link
-                href="#"
-                className="mt-2 px-4 py-2 text-sm font-medium text-[#0F3D2E] border border-[#0F3D2E] rounded-lg"
+                href="/login?next=/portal"
+                className="mt-2 px-4 py-2 text-sm font-medium text-[#4EDD00] border border-[#4EDD00] rounded-lg"
               >
                 Patient Login
               </Link>
