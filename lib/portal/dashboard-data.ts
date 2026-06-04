@@ -1,63 +1,83 @@
 import { createClient } from "@/lib/supabase/server";
-import type { PrescreenEligibility, PrescreenRow } from "@/lib/database.types";
+import type { PrescreenRow, PrescreeningResponseRow } from "@/lib/database.types";
+import { formatMcPrescreeningResponseLines } from "@/lib/mc-flow/mc-prescreening-format";
+import { getCustomerPrescreenSummary } from "@/lib/prescreen/eligibility";
+
+export type PrescreenPortalSnapshot = Pick<
+  PrescreenRow,
+  "id" | "created_at" | "workflow_status" | "version"
+>;
 
 export type PrescreenStatusSummary = {
-  record: PrescreenRow | null;
+  record: PrescreenPortalSnapshot | null;
+  /** Latest medicinal-cannabis questionnaire row (separate from legacy `prescreens`). */
+  mcRecord: PrescreeningResponseRow | null;
   label: string;
   detail: string;
+  answerLines: string[];
 };
-
-function eligibilityCopy(status: PrescreenEligibility): { label: string; detail: string } {
-  switch (status) {
-    case "eligible":
-    case "eligible_for_booking":
-      return {
-        label: "Eligible to book",
-        detail: "You can proceed to schedule a consultation when booking opens.",
-      };
-    case "ineligible":
-      return {
-        label: "Not eligible online",
-        detail: "Our team may contact you if follow-up is appropriate.",
-      };
-    case "needs_review":
-      return {
-        label: "Under review",
-        detail: "A clinician or administrator is reviewing your pre-screen.",
-      };
-    default:
-      return {
-        label: "In progress",
-        detail: "We are processing your pre-screening information.",
-      };
-  }
-}
 
 export async function getLatestPrescreenForUser(
   userId: string,
 ): Promise<PrescreenStatusSummary> {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("prescreens")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const [legacyRes, mcRes] = await Promise.all([
+    supabase
+      .from("prescreens")
+      .select("id, created_at, workflow_status, version")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("prescreening_responses")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  if (error || !data) {
+  const mcRecord = (mcRes.data as PrescreeningResponseRow | null) ?? null;
+  const answerLines = mcRecord ? formatMcPrescreeningResponseLines(mcRecord) : [];
+
+  const data = legacyRes.data;
+  const legacyErr = legacyRes.error;
+
+  if (!legacyErr && data) {
+    const record = data as PrescreenPortalSnapshot;
+    const copy = getCustomerPrescreenSummary(record.workflow_status);
     return {
-      record: null,
-      label: "Not started",
-      detail: "Complete pre-screening to move forward with a consultation.",
+      record,
+      mcRecord,
+      label: copy.label,
+      detail: copy.detail,
+      answerLines,
     };
   }
 
-  const record = data as PrescreenRow;
-  const copy = eligibilityCopy(record.eligibility);
+  if (mcRecord) {
+    const label = mcRecord.eligible
+      ? "Pre-screening complete"
+      : "Pre-screening on file";
+    const detail = mcRecord.eligible
+      ? "Your questionnaire is on file and you meet our initial eligibility criteria."
+      : mcRecord.ineligible_reason?.trim() ||
+        "Based on your answers, our standard online booking path may not apply. Our team can help with next steps.";
+    return {
+      record: null,
+      mcRecord,
+      label,
+      detail,
+      answerLines,
+    };
+  }
+
   return {
-    record,
-    label: copy.label,
-    detail: copy.detail,
+    record: null,
+    mcRecord: null,
+    label: "Not started",
+    detail: "Complete pre-screening to move forward with a consultation.",
+    answerLines: [],
   };
 }

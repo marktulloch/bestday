@@ -36,10 +36,10 @@ export default function FAQ({ items }: FAQProps) {
               onKeyDown={(e) => handleKeyDown(e, index)}
               aria-expanded={openIndex === index}
               aria-controls={`faq-answer-${index}`}
-              className="w-full text-left flex items-center justify-between py-2 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E] focus:ring-offset-2 rounded"
+              className="w-full text-left flex items-center justify-between py-2 focus:outline-none focus:ring-2 focus:ring-[#4EDD00] focus:ring-offset-2 rounded"
             >
               <span className="font-medium text-lg">{item.question}</span>
-              <span className="text-[#0F3D2E] text-xl font-semibold ml-4">
+              <span className="text-[#4EDD00] text-xl font-semibold ml-4">
                 {openIndex === index ? "−" : "+"}
               </span>
             </button>

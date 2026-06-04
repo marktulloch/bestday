@@ -5,9 +5,14 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { trackPrescreenEventServer } from "@/lib/analytics/prescreen-events";
-import type { PrescreenEligibility, TicketPriority } from "@/lib/database.types";
+import { AUDIT_ACTION } from "@/lib/audit/actions";
+import { logAuditEvent } from "@/lib/audit/server";
+import type { Json } from "@/lib/database.types";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { computePrescreenEligibility, outcomeToQueryParam } from "@/lib/prescreen/eligibility";
+import {
+  evaluateSubmittedPrescreen,
+  workflowStatusToQueryParam,
+} from "@/lib/prescreen/eligibility";
 import {
   applyStep1ToPayload,
   buildPayloadAfterStep2,
@@ -19,6 +24,13 @@ import {
   FUNNEL_PRESCREEN_COOKIE,
 } from "@/lib/portal/funnel-constants";
 import { createClient } from "@/lib/supabase/server";
+import { syncPrescreenCaseTicket } from "@/lib/tickets/prescreen-case";
+
+function logPrescreenTicketSyncFailure(phase: "step_one" | "step_two", err: unknown) {
+  if (process.env.NODE_ENV === "development") {
+    console.warn(`[prescreen] syncPrescreenCaseTicket failed (${phase}):`, err);
+  }
+}
 
 const boolish = z.preprocess(
   (v) => v === true || v === "on" || v === "true",
@@ -154,7 +166,10 @@ export async function submitPrescreenStepOne(input: PrescreenStepOneInput) {
         lead_id: leadId,
         payload,
         version,
-        eligibility: "pending",
+        workflow_status: "draft",
+        decision_reason_codes: [],
+        decision_log: [],
+        decision_summary_admin: null,
       })
       .eq("id", row.id);
 
@@ -176,7 +191,10 @@ export async function submitPrescreenStepOne(input: PrescreenStepOneInput) {
         lead_id: leadId,
         user_id: null,
         payload,
-        eligibility: "pending",
+        workflow_status: "draft",
+        decision_reason_codes: [],
+        decision_log: [],
+        decision_summary_admin: null,
         version: 1,
       })
       .select("id")
@@ -198,6 +216,23 @@ export async function submitPrescreenStepOne(input: PrescreenStepOneInput) {
   jar.set(FUNNEL_PRESCREEN_COOKIE, prescreenId, cookieBase);
   if (leadId) {
     jar.set(FUNNEL_LEAD_COOKIE, leadId, cookieBase);
+  }
+
+  const supabaseUser = await createClient();
+  const {
+    data: { user: stepOneUser },
+  } = await supabaseUser.auth.getUser();
+  const emailLabel = emailNorm ?? "Anonymous";
+  try {
+    await syncPrescreenCaseTicket(admin, {
+      prescreenId,
+      leadId,
+      createdByUserId: stepOneUser?.id ?? null,
+      emailLabel,
+      workflowStatus: "draft",
+    });
+  } catch {
+    redirect("/prescreen?error=ticket");
   }
 
   trackPrescreenEventServer("prescreen_step_one_saved", { prescreenId });
@@ -223,7 +258,7 @@ export async function submitPrescreenStepTwo(input: PrescreenStepTwoInput) {
   const admin = createAdminClient();
   const { data: row, error: fetchErr } = await admin
     .from("prescreens")
-    .select("id, payload, version, lead_id")
+    .select("id, payload, version, lead_id, workflow_status")
     .eq("id", prescreenId)
     .maybeSingle();
 
@@ -243,13 +278,12 @@ export async function submitPrescreenStepTwo(input: PrescreenStepTwoInput) {
     redirect("/prescreen/details?error=validation");
   }
 
-  const businessOutcome = computePrescreenEligibility({
+  const decision = evaluateSubmittedPrescreen({
     nzResident: normalized.step1.nzResident,
     consultationConsent: step2.consentConsultation,
     ageRange: normalized.step1.ageRange,
     consultationReason: step2.consultationReason,
   });
-  const eligibility = businessOutcome as PrescreenEligibility;
   const nextVersion = (row.version ?? 1) + 1;
 
   const supabase = await createClient();
@@ -261,7 +295,10 @@ export async function submitPrescreenStepTwo(input: PrescreenStepTwoInput) {
     .from("prescreens")
     .update({
       payload,
-      eligibility,
+      workflow_status: decision.status,
+      decision_reason_codes: decision.reasonCodes,
+      decision_log: decision.log as unknown as Json,
+      decision_summary_admin: decision.adminSummary,
       version: nextVersion,
       ...(user?.id ? { user_id: user.id } : {}),
     })
@@ -270,6 +307,19 @@ export async function submitPrescreenStepTwo(input: PrescreenStepTwoInput) {
   if (upErr) {
     redirect("/prescreen/details?error=save");
   }
+
+  await logAuditEvent({
+    actorId: user?.id ?? null,
+    action: AUDIT_ACTION.prescreen_workflow_updated,
+    entityType: "prescreen",
+    entityId: row.id,
+    metadata: {
+      from_workflow_status: row.workflow_status,
+      to_workflow_status: decision.status,
+      reason_codes: decision.reasonCodes,
+      version: nextVersion,
+    },
+  });
 
   let customerId: string | null = null;
   if (user?.id) {
@@ -298,40 +348,22 @@ export async function submitPrescreenStepTwo(input: PrescreenStepTwoInput) {
       ? normalized.step1.email
       : "Anonymous";
 
-  const ticketPriority: TicketPriority = eligibility === "ineligible" ? "low" : "normal";
-
-  const { data: existingTicket } = await admin
-    .from("tickets")
-    .select("id")
-    .eq("prescreen_id", row.id)
-    .maybeSingle();
-
-  if (!existingTicket?.id) {
-    const { error: ticketErr } = await admin.from("tickets").insert({
-      prescreen_id: row.id,
-      lead_id: row.lead_id,
-      customer_id: customerId,
-      created_by_user_id: user?.id ?? null,
-      subject: `Pre-screen: ${emailLabel} (${eligibility})`,
-      status: "open",
-      priority: ticketPriority,
-      metadata: {
-        source: "prescreen_auto",
-        eligibility,
-        prescreen_id: row.id,
-      },
-    });
-
-    if (ticketErr) {
-      redirect("/prescreen/details?error=ticket");
-    }
-  }
+  void syncPrescreenCaseTicket(admin, {
+    prescreenId: row.id,
+    leadId: row.lead_id,
+    createdByUserId: user?.id ?? null,
+    emailLabel,
+    workflowStatus: decision.status,
+    reasonCodes: decision.reasonCodes,
+    decisionSummary: decision.adminSummary,
+  }).catch((err) => logPrescreenTicketSyncFailure("step_two", err));
 
   trackPrescreenEventServer("prescreen_step_two_saved", {
     prescreenId: row.id,
-    eligibility,
+    workflow_status: decision.status,
+    reason_codes: decision.reasonCodes,
   });
 
-  const q = outcomeToQueryParam(businessOutcome);
+  const q = workflowStatusToQueryParam(decision.completeOutcome);
   redirect(`/prescreen/complete?outcome=${q}`);
 }

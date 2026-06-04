@@ -4,13 +4,13 @@
   --background: #ffffff;
   --foreground: #171717;
   --hero-image: url('https://placehold.co/1920x1080/ffffff/cccccc?text=Hero+Image');
-  --color-primary: #0F3D2E;
-  --color-primary-hover: #0C3326;
-  --color-primary-soft: #E6F2ED;
+  --color-primary: #4EDD00;
+  --color-primary-hover: #3db800;
+  --color-primary-soft: #E8FBE0;
   --color-text-primary: #1F2937;
   --color-text-secondary: #4B5563;
   --color-border-subtle: #E5E7EB;
-  --color-border-soft: #D1E5DC;
+  --color-border-soft: #C5F0B0;
 }
 
 @theme inline {
@@ -18,11 +18,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-brand-primary: #0F3D2E;
-  --color-brand-primary-hover: #0C3326;
-  --color-brand-primaryHover: #0C3326;
-  --color-brand-secondary: #E6F2ED;
-  --color-brand-borderSoft: #D1E5DC;
+  --color-brand-primary: #4EDD00;
+  --color-brand-primary-hover: #3db800;
+  --color-brand-primaryHover: #3db800;
+  --color-brand-secondary: #E8FBE0;
+  --color-brand-borderSoft: #C5F0B0;
 }
 
 @media (prefers-color-scheme: dark) {
