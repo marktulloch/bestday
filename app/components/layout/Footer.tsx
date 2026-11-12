@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Container from "./Container";
 
 export default function Footer() {
@@ -10,14 +9,6 @@ export default function Footer() {
             <p>
               This service provides access to registered healthcare professionals. Consultations are conducted in accordance with New Zealand medical practice standards. This service is not intended for emergency medical situations.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/privacy" className="hover:text-gray-900 underline">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="hover:text-gray-900 underline">
-                Terms of Service
-              </Link>
-            </div>
             <p className="text-xs">
               Best Day operates in compliance with New Zealand healthcare regulations and privacy legislation, including the Health Information Privacy Code 2020 and the Privacy Act 2020.
             </p>
