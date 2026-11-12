@@ -61,30 +61,8 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Desktop Buttons */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Link
-              href="#"
-              className="px-4 py-2 text-sm font-medium text-[#0F3D2E] border border-[#0F3D2E] rounded-lg hover:bg-[#E6F2ED] transition-colors"
-            >
-              Patient Login
-            </Link>
-            <Link
-              href="/prescreen"
-              className="px-4 py-2 text-sm font-medium text-white bg-[#0F3D2E] rounded-lg hover:bg-[#0C3326] transition-colors"
-            >
-              Start pre-screening
-            </Link>
-          </div>
-
           {/* Mobile Controls */}
           <div className="flex lg:hidden items-center gap-2">
-            <Link
-              href="/prescreen"
-              className="px-3 py-2 text-xs font-medium text-white bg-[#0F3D2E] rounded-lg"
-            >
-              Start
-            </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2"
@@ -130,12 +108,6 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                href="#"
-                className="mt-2 px-4 py-2 text-sm font-medium text-[#0F3D2E] border border-[#0F3D2E] rounded-lg"
-              >
-                Patient Login
-              </Link>
             </nav>
           </div>
         )}
